@@ -54,8 +54,8 @@ typedef enum Repl_Policy_enum {
                          isn't stored at the cache */
   REPL_MLP,           /* mlp based replacement  -- uses MLP_REPL_POLICY */
   REPL_PARTITION,     /* Based on the partition*/
-  REPL_SRRIP,         /* rrip policy */
-  NUM_REPL
+  NUM_REPL,
+  REPL_SRRIP         /* rrip policy */
 } Repl_Policy;
 
 typedef struct Cache_Entry_struct {
@@ -80,7 +80,6 @@ typedef enum Cache_Insert_Repl_enum {
                          order*/
   INSERT_REPL_MID, /* Insert such that it is Middle(Roughly) of the repl order*/
   INSERT_REPL_MRU, /* Insert into MRU position */
-  INSERT_REPL_SRRIP,
   NUM_INSERT_REPL
 } Cache_Insert_Repl;
 

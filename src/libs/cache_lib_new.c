@@ -37,7 +37,7 @@
 #include "core.param.h"
 #include "debug/debug.param.h"
 #include "general.param.h"
-#include "libs/cache_lib.h"
+#include "libs/cache_lib_new.h"
 #include "memory/memory.param.h"
 
 // DeleteMe
@@ -283,10 +283,6 @@ void* cache_insert_replpos(Cache* cache, uns8 proc_id, Addr addr,
   uns          repl_index;
   uns          set = cache_index(cache, addr, &tag, line_addr);
   Cache_Entry* new_line;
-  
-  if (cache->repl_policy == REPL_SRRIP) {
-    insert_repl_policy = INSERT_REPL_SRRIP;
-  }
 
   if(cache->repl_policy == REPL_IDEAL) {
     new_line        = insert_sure_line(cache, set, tag);
@@ -362,7 +358,7 @@ void* cache_insert_replpos(Cache* cache, uns8 proc_id, Addr addr,
         new_line->last_access_time = sim_time;
       free(access);
     } break;
-    case INSERT_REPL_SRRIP:
+    case REPL_SRRIP:
       new_line->rrpv = cache->assoc - 2;
       break;
     default:
@@ -564,10 +560,10 @@ Cache_Entry* find_repl_entry(Cache* cache, uns8 proc_id, uns set, uns* way) {
       *way = lru_ind;
       return &cache->entries[set][lru_ind];
     }
-    case REPL_SRRIP: {
+    case REPL_SRRIP:
       uns assoc = cache->assoc;
       /* if an entry is invalid, directly replace it */
-      for (ii = 0; ii < assoc; ii++) {
+      for(ii = 0; ii < assoc; ii++) {
         Cache_Entry* entry = &cache->entries[set][ii];
         if (!entry->valid) {
           *way = ii;
@@ -576,19 +572,19 @@ Cache_Entry* find_repl_entry(Cache* cache, uns8 proc_id, uns set, uns* way) {
       }
       /* if full, find an entry with 2^m-1,
         else increment all the RRPVs, and find the value */
-      while (1) {
-        for (ii = 0; ii < assoc; ii++) {
+      while(1) {
+        for(ii = 0; ii < assoc; ii++) {
           Cache_Entry* entry = &cache->entries[set][ii];
-          if (entry->rrpv == assoc - 1) {
+          if (entry->rrpv == assoc-1) {
             *way = ii;
             return entry;
           }
         }
-        for (ii = 0; ii < assoc; ii++) {
+        for(ii = 0; ii < assoc; ii++) {
           cache->entries[set][ii].rrpv++;
         }
       }
-    }  break;
+      break;
 
     default:
       ASSERT(0, FALSE);
